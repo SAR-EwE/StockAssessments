@@ -38,5 +38,13 @@ differ from the baseline here:
 - **Ecopath inputs:** the `total` row of `BA.1985` and `BA.3yr` for
   multi-stanza species uses only stanza 1, because the matrix is indexed as a
   single vector.
-- **Alternative M weight-at-length:** uses ad hoc multipliers to convert
-  `wgt.a` to cm units (exact only when b = 3).
+- **Alternative M weight-at-length:** the hard-coded multipliers give the
+  wrong weights for most species (e.g. BSB about 1.7x too heavy, GAJ about
+  1.5x, golden tilefish about 0.7x). The true units are in
+  `config/species.csv`. Because the error is a constant factor, it changes
+  only the unscaled M columns; the `*.scaled` columns are unaffected.
+- **Index CVs (`indices_header.csv`):** the code picks up both `cv.U.*` and
+  `cv.unwgted.U.*` columns. For every species except BSB and GTLF this
+  repeats the rows, and from the second index on each index gets the wrong
+  CV. For example, the second index's CV is actually the unweighted CV of the
+  first.

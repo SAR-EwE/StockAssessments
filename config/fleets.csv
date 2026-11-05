@@ -1,0 +1,48 @@
+species_id,sedar,bam_fleet,catch_type,sector,ewe_fleet,description
+BSB,76,cl,landings,commercial,BSB,Commercial lines
+BSB,76,cp,landings,commercial,BSB,Commercial pots
+BSB,76,ct,landings,commercial,BSB,Commercial trawl
+BSB,76,hb,both,recreational,BSB,Headboat
+BSB,76,mrip,both,recreational,BSB,General recreational (MRIP)
+BSB,76,comm,discards,commercial,BSB,Commercial (all gears)
+BTLF,50,cH,landings,commercial,BTLF,Commercial handline
+BTLF,50,cL,landings,commercial,BTLF,Commercial longline
+BTLF,50,GR,landings,recreational,BTLF,General recreational
+GAG,71,cH,both,commercial,GAG,Commercial handline
+GAG,71,cD,landings,commercial,GAG,Commercial diving
+GAG,71,HB,both,recreational,GAG,Headboat
+GAG,71,GR,both,recreational,GAG,General recreational
+GAJ,59,cH,both,commercial,GAJ,Commercial handline
+GAJ,59,GR,both,recreational,GAJ,General recreational (incl. headboat)
+GTF,82,cHLs,landings,commercial,GTF,Commercial handline (s region)
+GTF,82,cHLn,landings,commercial,GTF,Commercial handline (n region)
+GTF,82,rHBs,landings,recreational,GTF,Headboat (s region)
+GTF,82,rGNs,landings,recreational,GTF,General recreational (s region)
+GTF,82,rGNn,landings,recreational,GTF,General recreational (n region)
+GTF,82,rHDs,discards,recreational,GTF,Headboat discards (s region)
+GTF,82,rGDs,discards,recreational,GTF,General recreational discards (s region)
+GTF,82,rGDn,discards,recreational,GTF,General recreational discards (n region)
+GTLF,66,cH,landings,commercial,GTLF,Commercial handline
+GTLF,66,cL,landings,commercial,GTLF,Commercial longline
+GTLF,66,rA,landings,recreational,GTLF,Recreational (all modes)
+RGRP,53,cH,both,commercial,RGRP,Commercial handline
+RGRP,53,cO,landings,commercial,RGRP,Commercial other
+RGRP,53,HB,both,recreational,RGRP,Headboat
+RGRP,53,GR,both,recreational,RGRP,General recreational
+RPGY,60,cHl,both,commercial,RPGY,Commercial hook and line
+RPGY,60,cTw,landings,commercial,RPGY,Commercial trawl
+RPGY,60,rHb,both,recreational,RPGY,Headboat
+RPGY,60,rGe,both,recreational,RPGY,General recreational
+RSN,73,cH,both,commercial,RSN,Commercial handline
+RSN,73,HB,both,recreational,RSN,Headboat
+RSN,73,GR,both,recreational,RSN,General recreational
+SCMP,68,COM,landings,commercial,SCMP,Commercial (all gears)
+SCMP,68,REC,landings,recreational,SCMP,Recreational (all modes)
+SNWY,36,cH,landings,commercial,SNWY,Commercial handline
+SNWY,36,cL,landings,commercial,SNWY,Commercial longline
+SNWY,36,GR,landings,recreational,SNWY,General recreational
+VSN,55,cH,both,commercial,VSN,Commercial handline
+VSN,55,cO,landings,commercial,VSN,Commercial other
+VSN,55,cHTR,landings,commercial,VSN,Commercial cHTR (gear to confirm)
+VSN,55,HB,both,recreational,VSN,Headboat
+VSN,55,GR,both,recreational,VSN,General recreational

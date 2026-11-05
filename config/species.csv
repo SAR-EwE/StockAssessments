@@ -1,0 +1,13 @@
+species_id,file,common_name,include,ewe_stanza_ages,maturity_col,gutted_to_whole,altM_target,lw_length_unit,lw_weight_unit,notes
+BSB,BSB_SEDAR76.rdat,Black sea bass,TRUE,"0,1,4",mat.female,none,M.oldest_age,mm,g,BAM includes age 0
+BTLF,BTLF_SEDAR50.rdat,Blueline tilefish,FALSE,,mat.female,none,M.constant,mm,kg,Not used in EwE yet; no discard fleets
+GAG,GAG_SEDAR71.rdat,Gag,TRUE,"0,1,5",mat.female,mean_ratio_gt1,M.constant,mm,kg,Landings in gutted weight; whole:gutted ratio < 1 at young ages so the mean of ratios > 1 is used
+GAJ,GAJ_SEDAR59.rdat,Greater amberjack,TRUE,"0,1,3",mat.female,none,M.oldest_age,mm,g,
+GTF,GTF_SEDAR82.rdat,Gray triggerfish,TRUE,0,mat.female,none,M.constant,mm,kg,Single stanza in EwE
+GTLF,GTLF_SEDAR66.rdat,Golden tilefish,TRUE,"0,1,4",mat.female,by_age,M.constant,mm,mt,Landings in gutted weight; no discard fleets; info$species is 'Tilefish'
+RGRP,RGRP_SEDAR53_FESupdate.rdat,Red grouper,TRUE,"0,1,4",mat.female,none,M.constant,mm,kg,FES update
+RPGY,RPGY_SEDAR60.rdat,Red porgy,TRUE,"0,1,3",mat.fem.endyr,none,M.constant,mm,kg,Maturity is terminal-year female maturity
+RSN,RSN_SEDAR73_update.rdat,Red snapper,TRUE,"0,1,4",mat.female,none,M.constant,mm,kg,
+SCMP,SCMP_SEDAR68.rdat,Scamp,FALSE,,mat.female,none,M.constant,mm,kg,Not used in EwE yet; info$species is mislabeled 'SA Red Grouper'; no discard fleets
+SNWY,SNWY_SEDAR36_update.rdat,Snowy grouper,TRUE,"0,1,5",mat.female,none,M.constant,mm,kg,No discard fleets
+VSN,VSN_SEDAR55_FESupdate.rdat,Vermilion snapper,TRUE,"0,1,4",mat.female,none,M.constant,mm,g,FES update

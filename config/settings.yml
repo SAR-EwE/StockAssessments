@@ -1,0 +1,12 @@
+# Global settings for the BAM -> EwE pipeline
+
+# Folder with the assessment .rdat files (relative to the repo root)
+data_dir: data/bam_rdats
+
+# Ecopath base year and model area
+base_year: 1995
+model_area_km2: 336192
+
+# Index CV column to report: "weighted" uses cv.U.<index> (the CV used in the
+# assessment fit); "unweighted" uses cv.unwgted.U.<index>, where present.
+index_cv: weighted
