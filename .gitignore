@@ -1,0 +1,23 @@
+# R session files
+.Rhistory
+.RData
+.Rapp.history
+.Ruserdata
+.Rproj.user/
+
+# renv library (the lockfile is tracked)
+renv/library/
+renv/staging/
+renv/local/
+
+# Office lock/temp files
+~$*
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local Claude Code settings
+.claude/settings.local.json

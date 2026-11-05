@@ -1,2 +1,10 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Stock assessment output files: store byte-for-byte (no line-ending
+# normalization) and skip text diffs, since they are large generated files
+*.rdat -text -diff
+
+# Binary office files
+*.xlsx binary
+*.xls  binary
