@@ -9,7 +9,7 @@ BTLF,HB,sel.m.HB,Headboat CPUE,
 GAG,HB,sel.m.HB,Headboat CPUE,
 GAG,VID,sel.m.VID,SERFS video,
 GAJ,cH,sel.m.cH,Commercial handline CPUE,
-GAJ,HB,,Headboat CPUE,No matching selectivity in rdat (legacy output NA); possibly sel.m.GR - confirm
+GAJ,HB,sel.m.GR,Headboat CPUE,No headboat selectivity in rdat; uses general recreational (legacy output NA)
 GAJ,VID,,SERFS video,No matching selectivity in rdat (legacy output NA) - confirm
 GTF,sTVs,sel.m.sTVs,SERFS trap/video (s region),
 GTLF,cL,sel.m.cL,Commercial longline CPUE,
@@ -34,4 +34,4 @@ VSN,cH,sel.m.cH,Commercial handline CPUE,
 VSN,HB,sel.m.HB,Headboat CPUE,
 VSN,GR,sel.m.GR,General recreational CPUE,
 VSN,FST,sel.m.FST,MARMAP Florida snapper trap,
-VSN,CVID,,SERFS chevron trap/video,No matching selectivity in rdat (legacy output NA); possibly sel.m.CVT - confirm
+VSN,CVID,sel.m.CVT,SERFS chevron trap/video,No CVID selectivity in rdat; uses chevron trap (legacy output NA)

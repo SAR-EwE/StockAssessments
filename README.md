@@ -310,9 +310,9 @@ Rscript legacy/BAM2EwE_age0_corr.R
 
 ## Open questions
 
-- **Missing selectivities:** GAJ headboat and video indices, and the VSN CVID
-  index, have no matching selectivity in their rdats. Is `sel.m.GR` right
-  for GAJ HB, and `sel.m.CVT` for VSN CVID?
+- **Missing selectivity:** the GAJ video index (VID) has no matching
+  selectivity in its rdat, so its selectivity summary is blank. (GAJ HB
+  uses `sel.m.GR`, and VSN CVID uses `sel.m.CVT`.)
 - **Fleet and index descriptions** in `config/` were inferred from BAM codes.
   Check the ones flagged "confirm" (e.g. VSN `cHTR`).
 - **Citations:** `data/bam_rdats/README.md` still needs the full SEDAR
