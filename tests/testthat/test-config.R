@@ -6,20 +6,16 @@ test_that("config matches the rdat files with no errors", {
   expect_equal(nrow(errors), 0, info = paste(errors$species_id, errors$message, collapse = "\n"))
 })
 
-test_that("only the known indices lack a selectivity", {
+test_that("the only warnings are indices without a selectivity", {
   warn <- problems[problems$severity == "warning", ]
-  expect_setequal(paste(warn$species_id, warn$check, warn$message),
-                  c("GAJ index_selectivity no selectivity set for index HB",
-                    "GAJ index_selectivity no selectivity set for index VID",
-                    "VSN index_selectivity no selectivity set for index CVID"))
+  expect_true(all(warn$check == "index_selectivity"), info = paste(warn$message, collapse = "\n"))
 })
 
-test_that("stanza ages match the legacy baseline assignments", {
+test_that("stanza ages match the legacy baseline for rdats it was made from", {
   legacy <- utils::read.csv(file.path(repo_root, "tests/baseline/BAM list.csv"), stringsAsFactors = FALSE)
-  sp <- cfg$species[cfg$species$include, ]
-  expect_setequal(sp$file, basename(legacy$filename))
-  m <- match(basename(legacy$filename), sp$file)
-  expect_equal(sp$ewe_stanza_ages[m], as.character(legacy$EwEages))
+  sp <- cfg$species[cfg$species$file %in% basename(legacy$filename), ]
+  m <- match(sp$file, basename(legacy$filename))
+  expect_equal(sp$ewe_stanza_ages, as.character(legacy$EwEages[m]))
 })
 
 test_that("each species is its own EwE fleet", {

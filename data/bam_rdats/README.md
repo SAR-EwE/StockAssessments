@@ -26,6 +26,9 @@ SEDAR 55 vermilion snapper) are not in the repo and stay on OneDrive under
 | `SNWY_SEDAR36_update.rdat` | SA Snowy Grouper | 36 update | 1974–2018 | 1–25 | yes |
 | `VSN_SEDAR55_FESupdate.rdat` | SA Vermilion Snapper | 55, FES update | 1946–2016 | 1–12 | yes |
 
+To add or replace an rdat, follow "Updating to a new assessment" in the main
+README, then update the table below.
+
 ## Notes
 
 - **Scamp:** the species name stored in `SCMP_SEDAR68.rdat` is

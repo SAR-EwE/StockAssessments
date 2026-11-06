@@ -11,6 +11,7 @@ process_species <- function(id, cfg) {
   bam <- read_bam(sp_cfg, cfg$settings$data_dir)
 
   res <- list(id = id, common_name = sp_cfg$common_name, file = sp_cfg$file,
+              ages = bam$ages,
               units = bam$dat$info[grep("^units", names(bam$dat$info))])
   res$B <- stanza_biomass(bam)
   res$M <- stanza_m(bam)
