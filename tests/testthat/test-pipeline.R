@@ -2,9 +2,9 @@
 # against the assessment totals and the legacy baseline (tests/baseline/).
 #
 # Regression tests compare a species with the baseline only while its
-# config still points at the rdat the baseline was made from. After an
-# assessment is updated, that species' comparisons are skipped, so update
-# the baseline only if you want to keep comparing it.
+# config still uses the rdat and the EwE stanza ages the baseline was made
+# with. After an assessment is updated or the stanza breaks are changed,
+# that species' comparisons are skipped.
 
 cfg <- load_config(repo_root)
 ids <- cfg$species$species_id[cfg$species$include]
@@ -14,11 +14,13 @@ names(results) <- ids
 baseline_dir <- file.path(repo_root, "tests", "baseline")
 baseline_list <- utils::read.csv(file.path(baseline_dir, "BAM list.csv"), stringsAsFactors = FALSE)
 
-# Baseline workbook for a species, or NULL if its rdat has changed since then
+# Baseline workbook for a species, or NULL if its rdat or stanza ages have
+# changed since the baseline was made
 baseline_workbook <- function(id) {
-  file <- cfg$species$file[cfg$species$species_id == id]
-  row <- baseline_list[basename(baseline_list$filename) == file, ]
+  sp <- cfg$species[cfg$species$species_id == id, ]
+  row <- baseline_list[basename(baseline_list$filename) == sp$file, ]
   if (nrow(row) == 0) return(NULL)
+  if (!identical(sp$ewe_stanza_ages, as.character(row$EwEages))) return(NULL)
   # legacy file names end in "_no age0" when the assessment starts at age 1
   suffix <- if (min(results[[id]]$ages) >= 1) "_no age0" else ""
   path <- file.path(baseline_dir, paste0(row$species, suffix, ".xlsx"))
@@ -60,8 +62,36 @@ test_that("catch by fleet sums to the stanza totals", {
       tot <- if (nrow(x)) sum(x$catch_mt) else 0
       expect_equal(tot, sum(r[[ct]]), tolerance = 1e-10, info = paste(r$id, ct))
     }
-    expect_true(all(r$catch_fleet$ewe_fleet == r$id), info = r$id)
+    fl <- cfg$fleets[cfg$fleets$species_id == r$id, ]
+    expect_equal(r$catch_fleet$ewe_fleet, fl$ewe_fleet[match(r$catch_fleet$bam_fleet, fl$bam_fleet)], info = r$id)
   }
+})
+
+# ---- changing modelling choices ---------------------------------------------
+
+test_that("different stanza breaks regroup the same totals", {
+  alt <- cfg
+  i <- which(alt$species$species_id == "GAG")
+  alt$species$ewe_stanza_ages[i] <- "0,1,3,8"
+  alt$species$stanza_ages[[i]] <- c(0L, 1L, 3L, 8L)
+  r <- process_species("GAG", alt)
+  expect_equal(colnames(r$B), c("age1", "age3", "age8"))  # gag assessment starts at age 1
+  expect_equal(rowSums(r$B), rowSums(results$GAG$B))
+  expect_equal(sum(r$landings), sum(results$GAG$landings))
+  expect_equal(r$stanza_lengths$age_start, c(0, 1, 3, 8))
+  expect_equal(nrow(r$alt_m), 4)
+})
+
+test_that("reassigning BAM fleets to other EwE fleets regroups the same catch", {
+  alt <- cfg
+  g <- alt$fleets$species_id == "GAG"
+  alt$fleets$ewe_fleet[g] <- ifelse(alt$fleets$sector[g] == "commercial", "GAG_comm", "GAG_rec")
+  r <- process_species("GAG", alt)
+  tabs <- combine_results(list(GAG = r), alt)
+  by_fleet <- tabs$catch_by_ewe_fleet
+  expect_setequal(unique(by_fleet$ewe_fleet), c("GAG_comm", "GAG_rec"))
+  expect_equal(sum(by_fleet$catch_mt), sum(r$landings) + sum(r$discards))
+  expect_equal(r$landings, results$GAG$landings)  # species totals don't depend on fleet assignment
 })
 
 test_that("every species has one EwE stanza per configured stanza with ages", {

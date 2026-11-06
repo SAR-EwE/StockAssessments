@@ -15,6 +15,14 @@ stanza_long <- function(res) {
 
 add_id <- function(df, id) if (is.null(df) || nrow(df) == 0) df else cbind(species_id = id, df)
 
+#' Catch summed over the BAM fleets assigned to each EwE fleet
+#' (config/fleets.csv ewe_fleet): year, ewe_fleet, catch_type, stanza, catch_mt.
+catch_by_ewe_fleet <- function(catch_fleet) {
+  if (is.null(catch_fleet) || nrow(catch_fleet) == 0) return(NULL)
+  out <- stats::aggregate(catch_mt ~ year + ewe_fleet + catch_type + stanza, data = catch_fleet, FUN = sum)
+  out[order(out$ewe_fleet, out$catch_type, out$stanza, out$year), ]
+}
+
 #' rbind data frames whose columns differ, filling missing columns with NA.
 rbind_fill <- function(dfs) {
   dfs <- Filter(function(d) !is.null(d) && nrow(d) > 0, dfs)
@@ -49,6 +57,7 @@ combine_results <- function(results, cfg) {
     species = species_info,
     stanza_timeseries = bind(stanza_long),
     catch_by_fleet = bind(function(r) add_id(r$catch_fleet, r$id)),
+    catch_by_ewe_fleet = bind(function(r) add_id(catch_by_ewe_fleet(r$catch_fleet), r$id)),
     ecopath_inputs = bind(function(r) r$ecopath),
     indices = idx_long,
     indices_wide = idx_wide,
@@ -94,6 +103,7 @@ write_species_xlsx <- function(res, path) {
   add("discards mt", res$discards, TRUE)
   add("landings mt fleet", fleet_wide("landings"))
   add("discards mt fleet", fleet_wide("discards"))
+  add("catch by ewe fleet", catch_by_ewe_fleet(res$catch_fleet))
   add("multistanza", res$multistanza)
   add("stanza lengths", res$stanza_lengths)
   add("index summary", res$index_summary)

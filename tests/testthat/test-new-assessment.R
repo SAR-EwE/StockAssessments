@@ -45,10 +45,16 @@ test_that("write_suggested_config replaces only that species' rows", {
 
   s <- suppressMessages(suggest_config(file.path(cfg$settings$data_dir, "RSN_SEDAR73_update.rdat"), "RSN", root = root))
   s$fleets$description[s$fleets$bam_fleet == "GR"] <- "changed"
+  s$fleets$ewe_fleet[s$fleets$bam_fleet == "cH"] <- "RSN_comm"
   write_suggested_config(s, root = root)
 
   fl <- read_fleet_config(file.path(root, "config", "fleets.csv"))
   expect_equal(fl$description[fl$species_id == "RSN" & fl$bam_fleet == "GR"], "changed")
+
+  # a custom EwE fleet assignment survives re-running suggest_config()
+  s2 <- suppressMessages(suggest_config(file.path(cfg$settings$data_dir, "RSN_SEDAR73_update.rdat"), "RSN", root = root))
+  expect_equal(s2$fleets$ewe_fleet[s2$fleets$bam_fleet == "cH"], "RSN_comm")
+  expect_equal(s2$fleets$ewe_fleet[s2$fleets$bam_fleet == "GR"], "RSN")
   others <- function(d) d[d$species_id != "RSN", ]
   key <- function(d) paste(d$species_id, d[[2]], d[[3]])
   old_fl <- others(cfg$fleets); new_fl <- others(fl)

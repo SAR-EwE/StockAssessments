@@ -7,7 +7,8 @@ It reads Beaufort Assessment Model (BAM) output files (`.rdat`), groups
 assessment ages into EwE stanzas, and writes:
 
 - biomass, F, M and Z by stanza and year;
-- landings and dead discards by fleet and stanza (one EwE fleet per species);
+- landings and dead discards by fleet and stanza (currently one EwE fleet per
+  species; configurable);
 - base-year Ecopath inputs (biomass, F, M, Z, catch, biomass accumulation);
 - relative abundance indices with CVs and selectivity summaries;
 - multi-stanza parameters (vbK, Wmat/Winf, proportion mature, stanza start
@@ -22,31 +23,136 @@ Synthesis assessment is available (see [Other assessment models](#other-assessme
 
 ---
 
-## Quick start
+## Where to start
 
-1. **Install R (4.4 or later) and the packages:**
+**You don't need to edit anything to get the EwE inputs.** The files in
+`config/` are already filled in for the current assessments, and the
+pipeline checks them against the rdats every time it runs. The results
+from the current setup are already in `output/`.
+
+What to do depends on what you need:
+
+| I want to... | Do this |
+|---|---|
+| Use the current EwE inputs | Open the files in `output/`; nothing needs to run (see [Outputs](#outputs)) |
+| Regenerate the outputs (e.g. after pulling changes) | [Run the pipeline](#run-the-pipeline) |
+| Change a modelling choice (base year, stanza ages, which species, ...) | Edit the file listed in [Changing a modelling choice](#changing-a-modelling-choice), then run the pipeline |
+| Add a new or updated assessment | Follow [Updating to a new assessment](#updating-to-a-new-assessment) |
+
+Before using the outputs in a model for the first time, read through
+`config/settings.yml` and the `ewe_stanza_ages` column of
+`config/species.csv` to confirm the base year, model area and stanza
+breaks are what you intend. Those are modelling choices. The other config
+columns describe the rdat files, and the pipeline checks them for you.
+
+### Set up (once)
+
+1. **Install R (4.4 or later) and RStudio**, then the packages:
 
    ```r
    install.packages(c("yaml", "openxlsx", "testthat"))
    ```
 
    To use the exact package versions the outputs were made with, run
-   `renv::restore()` from the repo root. `renv.lock` records them.
+   `renv::restore()` in the project instead. `renv.lock` records them.
 
-2. **Run the pipeline** from the repo root (or open `StockAssessments.Rproj`
-   in RStudio and source the script):
+2. **Clone the repo**, and open `StockAssessments.Rproj` in RStudio. That
+   sets the working directory to the repo root, which every script expects.
 
-   ```bash
-   Rscript run_bam2ewe.R
-   ```
+### Run the pipeline
 
-3. **Find the results in `output/`** (see [Outputs](#outputs)).
+In RStudio, open `run_bam2ewe.R` and click **Source**. From a terminal in
+the repo root, run:
 
-4. **Optionally, run the tests:**
+```bash
+Rscript run_bam2ewe.R
+```
 
-   ```bash
-   Rscript -e 'testthat::test_dir("tests/testthat")'
-   ```
+It prints `Processing <species>` for each species and ends with
+`Wrote 12 tables and 10 workbooks to output/`. Then check what it printed:
+
+- **`[warning] ... no selectivity set for index ...`** is expected (the GAJ
+  video index has none) and harmless.
+- **`Config validation failed`** means the config and an rdat disagree. The
+  messages above it name the species, file and column to fix.
+- **`reconciliation differences > 0.01%`** means a species' totals didn't add
+  back up to the assessment. Investigate before using its outputs.
+
+To confirm everything still works after a change, run the tests (about a
+minute):
+
+```bash
+Rscript -e 'testthat::test_dir("tests/testthat")'
+```
+
+### Changing a modelling choice
+
+Edit the file, save it, and run the pipeline again. Open the CSVs in Excel
+or a text editor. Keep the column names unchanged, and save as CSV.
+
+| To change... | Edit | Column / setting |
+|---|---|---|
+| Ecopath base year | `config/settings.yml` | `base_year` |
+| Model area (for t/km²) | `config/settings.yml` | `model_area_km2` |
+| Weighted or unweighted index CVs | `config/settings.yml` | `index_cv` |
+| Which species are processed | `config/species.csv` | `include` (`TRUE`/`FALSE`) |
+| EwE stanza breaks | `config/species.csv` | `ewe_stanza_ages`, e.g. `"0,1,4"` |
+| Target M for the Lorenzen alternative M | `config/species.csv` | `altM_target` |
+| Which EwE fleet a BAM fleet's catch goes to | `config/fleets.csv` | `ewe_fleet` |
+| The selectivity summarized for an index | `config/indices.csv` | `selectivity` |
+
+The other config columns (file names, maturity column, gutted weight,
+length-weight units, fleet codes) describe the rdat files. Change them only
+when the rdat changes. If one is wrong, the pipeline stops and says which.
+
+#### Stanza breaks (`ewe_stanza_ages`)
+
+Each species' row in `config/species.csv` lists the age (years) at which
+each EwE stanza starts, separated by commas and in quotes:
+
+| Value | Stanzas |
+|---|---|
+| `"0,1,4"` | age 0; ages 1-3; ages 4 and older (gag is currently `"0,1,5"`) |
+| `"0,2,6"` | ages 0-1; ages 2-5; ages 6 and older |
+| `0` | one stanza for all ages |
+
+- The list must start at 0, increase, and not exceed the assessment's oldest
+  age. The pipeline stops with an error otherwise.
+- Every assessment age goes to the last stanza that starts at or before it.
+- Most assessments start at age 1, so their age-0 stanza has no assessment
+  ages. The biomass, F, M, Z and catch tables start at the age-1 stanza
+  (columns `age1`, `age4`, ...). The stanza-length and alternative-M tables
+  still include the age-0 stanza.
+- Changing the breaks changes how ages are grouped, not the totals. Total
+  biomass and catch for the species stay the same.
+- The regression tests compare a species with the original OneDrive outputs
+  only while its stanza breaks are unchanged. For a species you change,
+  those comparisons are skipped; all other tests still apply.
+
+#### Fleet assignments (`ewe_fleet`)
+
+Each BAM fleet has one row in `config/fleets.csv`, and its `ewe_fleet`
+column names the EwE fleet its landings and discards go to. Currently
+every BAM fleet goes to a fleet named after its species (`GAG`, `RSN`, ...).
+To use different EwE fleets, change those names. For example, to split gag
+into commercial and recreational fleets:
+
+| bam_fleet | sector | ewe_fleet |
+|---|---|---|
+| cH, cD | commercial | `GAG_comm` |
+| HB, GR | recreational | `GAG_rec` |
+
+The `sector` column can help with grouping. Any name works, and several
+species can share an EwE fleet (e.g. `comm_handline`).
+
+- **`output/catch_by_ewe_fleet.csv`** holds catch summed by EwE fleet,
+  stanza, year and catch type. `catch_by_fleet.csv` keeps the BAM-fleet
+  detail, with each fleet's EwE fleet alongside.
+- **Not affected:** species totals (landings, discards, F, Ecopath inputs)
+  don't depend on fleet assignment.
+- **Updating an assessment:** your EwE fleet assignments are kept for fleet
+  codes that are still in the new rdat. New fleet codes start out assigned to
+  the species' own fleet, so check them.
 
 ## What `run_bam2ewe.R` does
 
@@ -213,7 +319,7 @@ rdat (e.g. the scamp rdat says "SA Red Grouper").
 | `bam_fleet` | Fleet code in `CLD.est.mats` (`Lw.<code>`, `Dw.<code>`) |
 | `catch_type` | `landings`, `discards`, or `both` |
 | `sector` | `commercial` or `recreational` |
-| `ewe_fleet` | EwE fleet; one fleet per species, so the `species_id` |
+| `ewe_fleet` | EwE fleet that receives this fleet's catch; currently the `species_id` (see [Fleet assignments](#fleet-assignments-ewe_fleet)) |
 | `description` | Free text |
 
 **`indices.csv`:** one row per abundance index.
@@ -233,7 +339,8 @@ rdat (e.g. the scamp rdat says "SA Red Grouper").
 |---|---|
 | `species.csv` | Species processed: file, SEDAR, years, stanzas, assessment units |
 | `stanza_timeseries.csv` | Year x stanza: biomass, F, M, Z, landings, discards |
-| `catch_by_fleet.csv` | Landings and discards by BAM fleet, EwE fleet and stanza |
+| `catch_by_fleet.csv` | Landings and discards by BAM fleet and stanza, with each fleet's EwE fleet |
+| `catch_by_ewe_fleet.csv` | Landings and discards summed by EwE fleet and stanza |
 | `ecopath_inputs.csv` | Base-year values by stanza and in total, with t/km² and biomass accumulation (`BA_1yr`, `BA_3yr`) |
 | `indices.csv`, `indices_wide.csv` | Index observations (long, and year x index) |
 | `index_summary.csv` | Mean CV and selectivity summary (A50, A95, Amax) for each index |

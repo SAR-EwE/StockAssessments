@@ -8,7 +8,9 @@
 # fleets and catch types, indices and matching selectivities, maturity column,
 # gutted-to-whole method, and length-weight units. If the species is already
 # in the config (an updated assessment), its stanza ages, include flag, name,
-# alternative-M target, and fleet/index descriptions are carried over.
+# alternative-M target, EwE fleet assignments, sectors, and fleet/index
+# descriptions are carried over. New fleet codes go to the EwE fleet named
+# after the species.
 # Anything that can't be inferred is left blank. Check it, then run
 # validate_config().
 
@@ -83,14 +85,17 @@ suggest_config <- function(file, species_id, common_name = NA, sedar = NA, root 
   land <- rdat_fleet_codes(dat, "Lw")
   disc <- rdat_fleet_codes(dat, "Dw")
   codes <- union(land, disc)
+  old <- match(codes, old_fl$bam_fleet)
+  # keep existing sector and EwE fleet assignments for fleet codes already in the config
+  keep <- function(old_values, default) ifelse(is.na(old) | is.na(old_values[old]), default, old_values[old])
   fleets <- data.frame(
     species_id = species_id,
     sedar = sedar,
     bam_fleet = codes,
     catch_type = ifelse(codes %in% land & codes %in% disc, "both", ifelse(codes %in% land, "landings", "discards")),
-    sector = guess_sector(codes),
-    ewe_fleet = species_id,
-    description = old_fl$description[match(codes, old_fl$bam_fleet)],
+    sector = keep(old_fl$sector, guess_sector(codes)),
+    ewe_fleet = keep(old_fl$ewe_fleet, species_id),
+    description = old_fl$description[old],
     stringsAsFactors = FALSE
   )
 
